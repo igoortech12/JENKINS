@@ -1,1 +1,17 @@
-test
+YOUTUBE
+Jenkins: O mínimo que você precisa saber
+    https://youtu.be/8OfhS5f7jIY
+
+
+Bugs "inicentes" pois código não testados entraram em produção.
+Mesmos códigos testados localmente podem dar problema quando eles são "mergeados" com outros código que acabaram de entrar no controle de versão.
+Execução de tarefas simples de forma totalmente manual.
+Dificuldade ou maior possibilidade de erro ao colocar uma nova versão em produção.
+Acompanhamente e métricas.
+
+O QUE É O JANKINS?
+    Jenkins é um sistema de automatização dos mais diversos tips de tarefas.
+    É muito utilizado para executar processos de CI e CD.
+
+FUNCIONAMENTO
+    
