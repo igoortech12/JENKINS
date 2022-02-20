@@ -1,0 +1,12 @@
+Jenkins: from zero to deploy
+fonte: https://medium.com/@allyxcristiano/jenkins-from-zero-to-deploy-e54a627f055a
+
+
+>docker pull jenkins/jenkins:lts
+>docker run -p 8080:8080 -p 50000:50000 jenkins/jenkins:lts
+>Acessar http://localhost:8080
+>Instalar plugins sugeridos
+>Criação de usuário
+>Instalar Plugins: Gerenciar Jenkins > Gerenciar Plugins
+>Instalar os plugins: Build Monitor View, Slack Notification, Periodic Backup, Publish Over SSH, Role-based Authorization Strategy e xUnit.
+>Projeto de software free-style: https://github.com/allyxcristiano/octoevents
