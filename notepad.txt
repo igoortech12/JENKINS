@@ -1,0 +1,48 @@
+YOUTUBE
+Jenkins: O mínimo que você precisa saber
+    https://youtu.be/8OfhS5f7jIY
+
+
+Bugs "inicentes" pois código não testados entraram em produção.
+Mesmos códigos testados localmente podem dar problema quando eles são "mergeados" com outros código que acabaram de entrar no controle de versão.
+Execução de tarefas simples de forma totalmente manual.
+Dificuldade ou maior possibilidade de erro ao colocar uma nova versão em produção.
+Acompanhamente e métricas.
+
+O QUE É O JANKINS?
+    Jenkins é um sistema de automatização dos mais diversos tips de tarefas.
+    É muito utilizado para executar processos de CI e CD.
+
+FUNCIONAMENTO
+    Desenvolvido em Java
+    Um arquivo WAR ou é executado através de um webserver (ex:Tomcat)
+    Possui uma interface web e também disponibiliza APIs
+    Vasta quantidade de plugins
+    Gerenciamento de usuários
+    Escala facilmente
+    Suporte a pipelines e arquivos declerativos (Jankinsfile)
+
+EM GERAL, O QUE ELE NORMALMENTE FAZ NA PRÁTICA?
+    Checkout da aplicação em um repositório logo após um commit
+    Executa processos de integração contínua (build, test, performance, tarefas necessárias para verificação do bom funcionamento do software)
+    Gera um relatório apresentando todos os passos executados
+    Realiza o processo de deploy de forma automatizada
+    Apresenta um pipeline com cada etapa da tarefa que está sendo executada
+    CRON com super poderes para executar as mais diversas tarefas de forma automatizada 
+
+PIPELINE
+    Trilha ou passo a passo com cada etapa de execução de uma tarefa
+    Pode ser criada facilmente através de um Jenkinsfile
+    Apresenta de forma visual
+
+    Exemplo de Jankinsfile
+        pipeline {
+            agent { docker { image 'php' } }
+            stages {
+                stage('build') {
+                    steps {
+                        sh 'php --version'
+                    }
+                }
+            }
+        }
