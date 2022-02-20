@@ -9,4 +9,3 @@ fonte: https://medium.com/@allyxcristiano/jenkins-from-zero-to-deploy-e54a627f05
 >Criação de usuário
 >Instalar Plugins: Gerenciar Jenkins > Gerenciar Plugins
 >Instalar os plugins: Build Monitor View, Slack Notification, Periodic Backup, Publish Over SSH, Role-based Authorization Strategy e xUnit.
->Projeto de software free-style: https://github.com/allyxcristiano/octoevents
