@@ -1,0 +1,46 @@
+Youtube: https://youtu.be/PxdsFL4NDfM
+
+Ambiente: Ubuntu 20.04 (AWS)
+
+PREPARAR AMBINETE (INSTALANDO JENKINS)
+>Atualizando repositórios
+  apt-get update
+>Instalando JAVA
+  apt install openjdk-11-jre-headless
+>Preparando o Jenkins
+  curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io.key | sudo tee \
+    /usr/share/keyrings/jenkins-keyring.asc > /dev/null
+  echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] \
+    https://pkg.jenkins.io/debian-stable binary/ | sudo tee \
+    /etc/apt/sources.list.d/jenkins.list > /dev/null
+>Atualizando repositórios
+  apt-get update
+>Instalando Jenkins
+  apt-get install jenkins
+>Instalando Docker
+  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+
+  sudo apt-get update
+
+  sudo apt-get install docker-ce docker-ce-cli containerd.io
+
+>Adicionar usuário Jenkins no grupo do Docker
+  usermod -aG docker jenkins
+
+>Reinicinado Jenkins 
+  systemctl restart jenkins 
+
+ACESSANDO JENKINS
+  localhost:8080 ou IP:8080
+
+DESBLOQUEAR JENKINS
+>Copiar key  
+  cat /var/lib/jenkins/secrets/initialAdminPassword
+
+INSTALANDO PLUGINS DOCKER/KUBERNETES
+>Acessar menu Gerenciar Jenkins
+>Acessar Gerenciar plugins
+>Na aba "Disponíveis" pesquisar por:
+  -Docker
+  -Kubernetes
+  -Kubernetes Continuous Deploy
