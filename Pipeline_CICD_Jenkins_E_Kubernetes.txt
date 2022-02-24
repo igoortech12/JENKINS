@@ -1,6 +1,10 @@
-Youtube: https://youtu.be/PxdsFL4NDfM
+Youtube: 
+Jenkins com Kubernetes - https://youtu.be/PxdsFL4NDfM
+Vídeos auxiliares:
+Criar cluster Kubernetes na AWS - https://youtu.be/1jXZOVYYWnk
+Instalando Clister Kubernetes do ZERO - https://youtu.be/TqMKBIinjew
 
-Ambiente: Ubuntu 20.04 (AWS)
+Ambiente Jenkins: Ubuntu 20.04 (AWS)
 
 PREPARAR AMBINETE (INSTALANDO JENKINS)
 >Atualizando repositórios
@@ -18,7 +22,7 @@ PREPARAR AMBINETE (INSTALANDO JENKINS)
 >Instalando Jenkins
   apt-get install jenkins
 >Instalando Docker
-  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+  curl -fsSL https://get.docker.com | sh
 
   sudo apt-get update
 
@@ -44,3 +48,14 @@ INSTALANDO PLUGINS DOCKER/KUBERNETES
   -Docker
   -Kubernetes
   -Kubernetes Continuous Deploy
+
+ADICIONANDO CHAVES DE AUTENTICAÇÃO
+>Acessar Gerenciar Jenkins
+>Acessar Manage Credentials
+>Acessar Scoped Jenkins
+>Acessar Global credentials (unrestricted)
+>Add Credentials
+  -Docker
+  -GitHub
+  -Kubernetes Secret File (kubeconfig.yaml)
+  -
