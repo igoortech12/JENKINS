@@ -1,0 +1,201 @@
+01. O primeiro jog com Jenkins
+
+# Configurando o ambiente e conectando máquina virtual:
+    # Máquina virtual com o vagrant
+    # Requisitos: http://vagrantup.com e https://www.virtualbox.org/
+        # Baixar e descompactar o arquivo 1110-aula-inicial.zip
+        # Entendendo o Vagranfile
+        # Subindo o ambiente virtualizado
+            vagrant plugin install vagrant-disksize
+            vagrant up
+            vagrant ssh
+                ps -ef | grep -i mysql # Verificando se o MySQL esta rodando
+                mysql -u devops -p # Senha mestre; show databases
+                mysql -u devops_dev -p # Senha mestre; show databases
+                # Instalando o Jenkins
+                    cd /vagrant/scripts
+                # Visualizar o conteudo do arquivo de instalacao do jenkins
+                    sudo ./jenkins.sh
+
+                # Acessar:  192.168.33.10:8080
+                    sudo cat /var/lib/jenkins/secrets/initialAdminPassword
+
+                # Credenciais
+                    Nome de usuário: alura
+                    Senha: mestre123
+                    Nome completo: Jenkins Alura
+                    Email: aluno@alura.com.br
+
+                # Reload nas permissoes do docker
+                    sudo usermod -aG docker $USER
+                    sudo usermod -aG docker jenkins
+                    exit
+            vagrant reload
+
+02. Build com Docker e Jenkins 
+
+# Passos para configurar a app e subir manualmente
+    # Criando o arquivo .env (temporário)
+        cd /vagrant/jenkins-todo-list/to_do/
+        vi .env
+            [config]
+            # Secret configuration
+            SECRET_KEY = 'r*5ltfzw-61ksdm41fuul8+hxs$86yo9%k1%k=(!@=-wv4qtyv'
+
+            # conf
+            DEBUG=True
+
+            # Database
+            DB_NAME = "todo_dev"
+            DB_USER = "devops_dev"
+            DB_PASSWORD = "mestre"
+            DB_HOST = "localhost"
+            DB_PORT = "3306"
+
+    # Instalando o venv
+        sudo pip3 install virtualenv nose coverage nosexcover pylint
+    # Criando e ativando o venv (dev)
+        cd ../    
+        virtualenv  --always-copy  venv-django-todolist
+        source venv-django-todolist/bin/activate
+        pip install -r requirements.txt
+    # Fazendo a migracao inicial dos dados
+        python manage.py makemigrations
+        python manage.py migrate
+    # Criando o superuser para acessar a app
+        python manage.py createsuperuser
+    # Repetir o processo de migracaoção para o ambiente de produção:
+        vi to_do/.env
+            [config]
+            # Secret configuration
+            SECRET_KEY = 'r*5ltfzw-61ksdm41fuul8+hxs$86yo9%k1%k=(!@=-wv4qtyv'
+
+            # conf
+            DEBUG=True
+
+            # Database
+            DB_NAME = "todo"
+            DB_USER = "devops"
+            DB_PASSWORD = "mestre"
+            DB_HOST = "localhost"
+            DB_PORT = "3306"
+
+    # Fazendo a migracao inicial dos dados
+        python manage.py makemigrations
+        python manage.py migrate
+    # Criando o superuser para acessar a app
+        python manage.py createsuperuser
+
+    # Verificar o ip do servidor
+        ip addr
+    # Rodando a app
+        python manage.py runserver 0:8000
+        http://192.168.33.10:8000
+
+# Expor o deamon do docker
+    sudo mkdir -p /etc/systemd/system/docker.service.d/
+    sudo vi /etc/systemd/system/docker.service.d/override.conf
+        [Service]
+        ExecStart=
+        ExecStart=/usr/bin/dockerd -H fd:// -H tcp://0.0.0.0:2376
+    sudo systemctl daemon-reload
+    sudo systemctl restart docker.service
+
+# Sugested Plugins
+# Instalando os plugins
+    Gerenciar Jenkins -> Gerenciar Plugins -> Disponíveis
+        # docker
+    Install without restart -> Depois reiniciar o jenkins
+Gerenciar Jenkins -> Configurar o sistema -> Nuvem
+    # Name: docker
+    # URI: tcp://127.0.0.1:2376
+    # Enabled
+# This project is parameterized: 
+    DOCKER_HOST
+    tcp://127.0.0.1:2376
+# Voltar no job criado na aula anterior
+    # Manter a mesma configuracao do GIT para desenvolvimento
+    # Build step 1: Executar Shell
+# Validando a sintaxe do Dockerfile
+docker run --rm -i hadolint/hadolint < Dockerfile
+    # Build step 2: Build/Publish Docker Image
+        Directory for Dockerfile: ./
+        Cloud: docker
+        Image: rafaelvzago/django_todolist_image_build
+
+03. Ambiente de produção e desenvolvimento.
+
+# Instalar o plugin Config File Provider
+
+# Configurar o Managed Files para Dev
+    # Name : .env-dev
+        [config]
+        # Secret configuration
+        SECRET_KEY = 'r*5ltfzw-61ksdm41fuul8+hxs$86yo9%k1%k=(!@=-wv4qtyv'
+        # conf
+        DEBUG=True
+        # Database
+        DB_NAME = "todo_dev"
+        DB_USER = "devops_dev"
+        DB_PASSWORD = "mestre"
+        DB_HOST = "localhost"
+        DB_PORT = "3306"
+
+# Configurar o Managed Files para Prod
+    # Name: .env.-prod
+        [config]
+        # Secret configuration
+        SECRET_KEY = 'r*5ltfzw-61ksdm41fuul8+hxs$86yo9%k1%k=(!@=-wv4qtyv'
+        # conf
+        DEBUG=False
+        # Database
+        DB_NAME = "todo"
+        DB_USER = "devops"
+        DB_PASSWORD = "mestre"
+        DB_HOST = "localhost"
+        DB_PORT = "3306"
+
+# No job: jenkins-todo-list-principal importar o env de dev para teste:
+
+    Adicionar passo no build: Provide configuration Files
+    File: .env-dev
+    Target: ./to_do/.env
+
+    Adicionar passo no build: Executar Shell
+
+# Criando o Script para Subir o container com o arquivo de env e testar a app:
+    #!/bin/sh
+
+    # Subindo o container de teste
+    docker run -d -p 82:8000 -v /var/run/mysqld/mysqld.sock:/var/run/mysqld/mysqld.sock -v /var/lib/jenkins/workspace/jenkins-todo-list-principal/to_do/.env:/usr/src/app/to_do/.env --name=todo-list-teste django_todolist_image_build
+
+    # Testando a imagem
+    docker exec -i todo-list-teste python manage.py test --keep
+    exit_code=$?
+
+    # Derrubando o container velho
+    docker rm -f todo-list-teste
+
+    if [ $exit_code -ne 0 ]; then
+        exit 1
+    fi
+
+# Instalar o plugin: Parameterized Trigger 
+
+# Modificar o Job para startar com 2 parametros:
+    # Geral:
+    Este build é parametrizado com 2 parametros de string
+        Nome: image
+        Valor padrão: <seu-usuario-no-dockerhub>/django_todolist_image_build
+
+        Nome: DOCKER_HOST
+        Valor padrão: tcp://127.0.0.1:2376
+
+# No build step: Build / Publish Docker Image
+    # Mudar o nome da imagem para: <seu-usuario-no-dockerhub>/django_todolist_image_build
+    # Marcar: Push Image e configurar **suas credenciais** no dockerhub
+
+# Mudar no job de teste a imagem para: ${image}
+    docker run -d -p 82:8000 -v /var/run/mysqld/mysqld.sock:/var/run/mysqld/mysqld.sock -v /var/lib/jenkins/workspace/jenkins-todo-list-principal/to_do/.env:/usr/src/app/to_do/.env --name=todo-list-teste ${image}
+
+04. Definindo o pipeline com código
